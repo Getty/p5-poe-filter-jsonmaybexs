@@ -27,10 +27,9 @@ sub get {
   my $ret = [];
 
   foreach my $json (@$lines) {
-    if ( my @jsons = eval { $self->[ OBJ ]->incr_parse( $json ) } ) {
-      push( @$ret, @jsons );
+    if ( my $data = eval { ($self->[ OBJ ]->decode( $json )) } ) {
+      push( @$ret, $data );
     } else {
-      $self->incr_skip;
       warn "Couldn't convert json: $@";
     }
   }
@@ -38,9 +37,9 @@ sub get {
 }
 
 sub get_one_start {
-    my ($self, $lines) = @_;
-    $lines = [ $lines ] unless ( ref( $lines ) );
-    push( @{ $self->[ BUFFER ] }, @{ $lines } );
+  my ($self, $lines) = @_;
+  $lines = [ $lines ] unless ( ref( $lines ) );
+  push( @{ $self->[ BUFFER ] }, @{ $lines } );
 }
 
 sub get_one {
@@ -48,10 +47,9 @@ sub get_one {
   my $ret = [];
 
   if ( my $line = shift ( @{ $self->[ BUFFER ] } ) ) {
-    if ( my @jsons = eval { $self->[ OBJ ]->incr_parse( $line ) } ) {
-      push( @$ret, @jsons );
+    if ( my $data = eval { ($self->[ OBJ ]->decode( $line )) } ) {
+      push( @$ret, $data );
     } else {
-      $self->incr_skip;
       warn "Couldn't convert json: $@";
     }
   }
@@ -89,22 +87,26 @@ __END__
   my $json_array = $filter->put( [ $obj ] );
   my $obj_array = $filter->get( $json_array );
 
-  use POE qw( Filter::Stackable Filter::Line Filter::JSONMaybeXS );
+  use POE qw(
+    Filter::Stackable
+    Filter::Line
+    Filter::JSONMaybeXS
+  );
 
   my $filter = POE::Filter::Stackable->new();
   $filter->push(
-    POE::Filter::JSONMaybeXS->new(),
     POE::Filter::Line->new(),
+    POE::Filter::JSONMaybeXS->new(),
   );
 
 =head1 DESCRIPTION
-
-Uses B<incr_parse>, so can handle incremental JSON...
 
 More documentation to come...
 
 More tests to come...
 
 Based on L<POE::Filter::JSON>
+
+Best used together with L<POE::Filter::Line>
 
 =cut
