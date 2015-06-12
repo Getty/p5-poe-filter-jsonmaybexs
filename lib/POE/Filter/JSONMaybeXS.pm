@@ -1,4 +1,5 @@
 package POE::Filter::JSONMaybeXS;
+# ABSTRACT: A POE filter using JSON::MaybeXS
 
 use Carp;
 use JSON::MaybeXS;
@@ -76,10 +77,6 @@ sub put {
 1;
 
 __END__
-
-=head1 NAME
-
-POE::Filter::JSONMaybeXS - A POE filter using JSON::MaybeXS
 
 =head1 SYNOPSIS
 
